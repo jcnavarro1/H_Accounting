@@ -1,0 +1,48 @@
+CREATE VIEW view_ik AS
+SELECT a.company_id,
+        a.account_code,
+        a.account,
+        a.balance_sheet_section_id,
+        a.profit_loss_section_id,
+        rg.report_group, cti.company_type,
+        c.company,
+        c.company_code,
+         rl.report_label, ss.statement_section,
+        ss.is_balance_sheet_section,
+        ss.debit_is_positive,
+       rclin.account_code_from,
+        rclin.account_code_until,
+        rclin.debit AS rclin_debit,
+        jeli.`description`,
+        jeli.debit,
+        jeli.credit,
+        lsn.journal_entry,
+        lsn.entry_date,
+        lsn.debit_credit_balanced
+    
+FROM
+    `account` AS a
+        INNER JOIN
+    report_group AS rg ON a.company_id = rg.company_id
+        INNER JOIN
+    company_type_id AS cti ON a.company_id = cti.company_id
+        INNER JOIN
+    company AS c ON cti.company_id = c.company_id
+        INNER JOIN
+    report_label AS rl ON a.company_id = rl.company_id
+        INNER JOIN
+    statement_section AS ss ON a.company_id = ss.company_id
+    INNER JOIN
+    report_configuration_line_item AS rclin ON a.company_id = rclin.company_id
+        INNER JOIN
+    report_configuration AS rco ON rclin.report_configuration_id = rco.report_configuration_id
+        INNER JOIN
+    report_criterion AS rc ON rco.report_id = rc.report_id
+        INNER JOIN
+    journal_entry_line_item AS jeli ON a.account_id = jeli.account_id
+    INNER JOIN
+        journal_entry AS je ON jeli.journal_entry_id = je.journal_entry_id
+INNER JOIN
+        ledger_serial_number AS lsn ON je.journal_entry_id = lsn.journal_entry_id
+ ;
+        
